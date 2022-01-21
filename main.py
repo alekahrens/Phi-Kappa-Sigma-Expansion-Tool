@@ -3,15 +3,29 @@ import pandas as pd
 from tkinter import *
 from tkinter.ttk import Combobox
 from PIL import ImageTk, Image
-
+import matplotlib
 
 window = Tk()
-col_list = ['INSTNM']
-df = pd.read_csv('College_Scorecard_1-19-2021.csv', usecols = col_list)
+df = pd.read_csv('College_Scorecard_1-19-2021.csv')
+
+
 
 def possibleExpansion():
+    possibleExp = Toplevel()
+    possibleExp.title('Possible Universities to expand to')
+    possibleExp.geometry("500x500")
     print("Still needs development")
 
+def generateExpansion():
+    selectedUniv = cb.get()
+    expansion = Toplevel()
+    expansion.title(selectedUniv)
+    expansion.geometry("500x350")
+
+    univIndex = univ.index(selectedUniv)
+    print(univIndex)
+
+    
 def specificUniv():
     spec = Toplevel()
     spec.title('Details on a University')
@@ -20,14 +34,15 @@ def specificUniv():
     lbl = Label(spec, text = "Pick a university", fg = 'red', font = ('Helvetica', 16))
     lbl.place(x = 165, y = 110)
 
-    print(df)
+    global univ
+    univ = df['INSTNM'].tolist()
 
-    value = "{" + df + "}"
+    global cb
+    cb = Combobox(spec, values = univ, width = 30, state = 'readonly', justify = 'left')
+    cb.place(x = 150, y = 150)
 
-    cb = Combobox(spec, values = value, width = 50, state = 'readonly', justify = 'left')
-    cb.place(x = 100, y = 150)
 
-    btn = Button(spec, text = "Generate report", fg = 'blue')
+    btn = Button(spec, text = "Generate report", fg = 'blue', command = generateExpansion)
     btn.place(x = 190, y = 200)
 
     spec.mainloop()
