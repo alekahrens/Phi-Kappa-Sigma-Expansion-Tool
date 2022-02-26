@@ -1,69 +1,113 @@
 import tkinter
-import pandas as pd
 from tkinter import *
 from tkinter.ttk import Combobox
+import pandas as pd
 from PIL import ImageTk, Image
-import matplotlib
+#import matplotlib.pylot as plt
+import numpy as np
+from tkinter import filedialog
+import shutil
+import os
 
-window = Tk()
-df = pd.read_csv('College_Scorecard_1-19-2021.csv')
 
 
+def possibleExpansion(root):
+    framePossEx = Frame(root, height=350)
+    framePossEx.pack(side=TOP, fill=X)
 
-def possibleExpansion():
-    possibleExp = Toplevel()
-    possibleExp.title('Possible Universities to expand to')
-    possibleExp.geometry("500x500")
-    print("Still needs development")
+def generateExpansion(root):
+    genExp  = Toplevel()
+    genExp.geometry('500x500')
+    selectedUni = cb.get()
+    genExp.title(selectedUni)
+    lblReport = Label(genExp, text="Report for " + selectedUni, fg='red', font=('Helvetica',16))
+    lblReport.place(x=50, y=25)
 
-def generateExpansion():
-    selectedUniv = cb.get()
-    expansion = Toplevel()
-    expansion.title(selectedUniv)
-    expansion.geometry("500x350")
+    gradRate = np.array()
 
-    univIndex = univ.index(selectedUniv)
-    print(univIndex)
 
-    
-def specificUniv():
-    spec = Toplevel()
-    spec.title('Details on a University')
-    spec.geometry("500x350")
-
-    lbl = Label(spec, text = "Pick a university", fg = 'red', font = ('Helvetica', 16))
-    lbl.place(x = 165, y = 110)
+def specificUniv(root):
+    frameSpUniv = Frame(root, height=350)
+    frameSpUniv.pack(side=TOP, fill=X)
+    root.title('Details on University')
+    print(data)
+    lbl = Label(root, text="Pick a university", fg='red', font=('Helvetica', 16))
+    lbl.place(x=165, y=110)
 
     global univ
     univ = df['INSTNM'].tolist()
 
     global cb
-    cb = Combobox(spec, values = univ, width = 30, state = 'readonly', justify = 'left')
-    cb.place(x = 150, y = 150)
+    cb = Combobox(root, values=univ, width=30, state='readonly', justify='left')
+    cb.place(x=150, y=150)
+
+    btn = Button(root, text="Generate report", fg='blue', command = lambda:generateExpansion(root))
+    btn.place(x=190, y=200)
 
 
-    btn = Button(spec, text = "Generate report", fg = 'blue', command = generateExpansion)
-    btn.place(x = 190, y = 200)
+def dataBase():
+    dataWindow = Toplevel()
+    dataWindow.geometry('500x350')
+    dataWindow.title("Database Options")
 
-    spec.mainloop()
+    btnBrowse = Button(dataWindow, text="Select Database", fg='blue', command = lambda:browseFiles())
+    btnBrowse.place(x = 350, y = 200)
+
+    btnUpload = Button(dataWindow, text="Upload Database", fg='blue', command=lambda: uploadNewDatabase())
+    btnUpload.place(x=250, y=200)
+
+    btnClose =Button(dataWindow, text="Close Window", fg='blue', command= lambda : dataWindow.destroy())
+    btnClose.place(x = 150, y = 200)
+
+def uploadNewDatabase():
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select a File",
+                                          filetypes=(("CSV files",
+                                                      ".csv"),
+                                                     ("all files",
+                                                      ".")))
+    directory = filedialog.askdirectory(initialdir="/",
+                                        title="Select a Directory")
+    shutil.move(filename, directory)
 
 
-if __name__=="__main__":
-    window.title('University Analysis')
-    window.geometry("500x350")
+def browseFiles():
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select a File",
+                                          filetypes=(("CSV files",
+                                                      ".csv"),
+                                                     ("all files",
+                                                      ".")))
+    data = filename
+
+
+
+def home(root):
+    frameHome = Frame(root, height=350)
+    frameHome.pack(side=TOP, fill=X)
+    root.geometry('500x350')
+    root.title('Phi Kappa Sigma Expansion Tool')
 
     openImg = Image.open("PKS.png")
     importImg = ImageTk.PhotoImage(openImg)
     img = tkinter.Label(image=importImg)
     img.image = importImg
-    img.place(x = 165, y = 0)
+    img.place(x=165, y=0)
 
+    btn = Button(text="Possible Expansion", command=lambda: possibleExpansion(root), fg='blue')
+    btn.place(x=75, y=300)
 
+    btn1 = tkinter.Button(text="Specific University", command=lambda: specificUniv(root), fg='blue')
+    btn1.place(x=300, y=300)
 
-    btn = Button(text = "Possible Expansion", command = possibleExpansion, fg = 'blue')
-    btn.place(x = 120, y = 300)
+    btn2 = tkinter.Button(text="Database", command=lambda: dataBase(), fg='blue')
+    btn2.place(x=210, y=300)
 
-    btn1 = tkinter.Button(text = "Specific University", command = specificUniv, fg = 'blue')
-    btn1.place(x = 250, y = 300)
-
-    window.mainloop()
+if __name__=="__main__":
+    root = Tk()
+    global data
+    global filename
+    data = filename
+    df = pd.read_csv(data)
+    home(root)
+    root.mainloop()
